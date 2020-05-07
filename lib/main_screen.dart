@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:ui_demo/components/animated_fab.dart';
+import 'package:ui_demo/model/list_model_.dart';
 import 'package:ui_demo/model/task_data_model.dart';
 import 'components/diagonal_clipper.dart';
 import 'model/task_row.dart';
@@ -12,8 +14,17 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 double _imageHeight = 256.0;
-class _MainScreenState extends State<MainScreen> {
+final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+ListModel listModel;
+bool showOnlyCompleted = false;
 
+
+class _MainScreenState extends State<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
+    listModel = ListModel(_listKey, tasks);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
           _buildTopHeader(),
           _buildProfileView(),
           _buildBottomPart(),
+          _buildFab(),
         ],
       ),
     );
@@ -160,10 +172,16 @@ Widget _buildTaskHeader(){
 
 // Task List section
 Widget _buildTaskList(){
-
   return Expanded(
-    child: ListView(
-      children: tasks.map((task) => TaskRow(task: task)).toList(),
+    child: AnimatedList(
+      initialItemCount: tasks.length,
+      key: _listKey,
+      itemBuilder: (context, index, animation){
+        return TaskRow(
+          task: listModel[index],
+          animation: animation,
+        );
+      },
     ),
   );
 }
@@ -179,4 +197,31 @@ Widget _buildTimeline(){
       color: Colors.grey[400],
     ),
   );
+}
+
+//FloatingActionButton build widget
+Widget _buildFab(){
+  return Positioned(
+    top: _imageHeight - 36.0,
+    right: 16.0,
+    child: Positioned(
+      top: _imageHeight - 100.0,
+      right: -40.0,
+      child: AnimatedFab(
+        onClick: _changeFilterState,
+      ),
+    ),
+  );
+}
+
+//change filterState method when FAB is click
+void _changeFilterState(){
+  showOnlyCompleted = !showOnlyCompleted;
+  tasks.where((task) => !task.completed).forEach((task) {
+    if(showOnlyCompleted){
+      listModel.removeAt(listModel.indexOf(task));
+    }else{
+      listModel.insert(tasks.indexOf(task), task);
+    }
+  });
 }

@@ -33,7 +33,7 @@ List<Task> tasks = [
     category: 'Company Website',
     time: '12pm',
     color: Colors.pink,
-    completed: false,
+    completed: true,
   ),
   Task(
     todo: 'Lunch with Habibi',
@@ -47,7 +47,7 @@ List<Task> tasks = [
     category: 'Hangouts',
     time: '3pm',
     color: Colors.amber,
-    completed: false,
+    completed: true,
   ),
   Task(
     todo: 'Salatu Asr',
